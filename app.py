@@ -30,7 +30,7 @@ app = Flask(__name__)
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 model = MobileNetV2(weights='imagenet')
 
-print('Model loaded. Check http://127.0.0.1:5000/')
+print('Model loaded')
 
 
 # Model saved with Keras model.save()
@@ -94,4 +94,4 @@ if __name__ == '__main__':
 
     # Serve the app locally with gevent
     # http_server = WSGIServer(('0.0.0.0', 5000), app)
-    #http_server.serve_forever()
+    # http_server.serve_forever()
