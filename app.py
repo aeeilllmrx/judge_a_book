@@ -90,8 +90,8 @@ def predict():
 
 
 if __name__ == '__main__':
-    # app.run(port=5002, threaded=False)
+    app.run()
 
-    # Serve the app with gevent
-    http_server = WSGIServer(('0.0.0.0', 5000), app)
-    http_server.serve_forever()
+    # Serve the app locally with gevent
+    # http_server = WSGIServer(('0.0.0.0', 5000), app)
+    #http_server.serve_forever()
