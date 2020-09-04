@@ -15,6 +15,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
 # Some utilites
+import json
 import numpy as np
 from util import base64_to_pil
 
@@ -57,6 +58,29 @@ def model_predict(img, model):
     preds = model.predict(x)
     return preds
 
+def decode_predictions_safe(preds, top=1):
+    '''
+    The original method has a memory leak- each time predict is called, we
+    re-download the imagenet class index file.
+    '''
+    if len(preds.shape) != 2 or preds.shape[1] != 1000:
+        raise ValueError('`decode_predictions` expects '
+                     'a batch of predictions '
+                     '(i.e. a 2D array of shape (samples, 1000)). '
+                     'Found array with shape: ' + str(preds.shape))
+
+    with open('./models/imagenet_class_index.json') as f:
+        CLASS_INDEX = json.load(f)
+
+    results = []
+    for pred in preds:
+        top_indices = pred.argsort()[-top:][::-1]
+        result = [tuple(CLASS_INDEX[str(i)]) + (pred[i],) for i in top_indices]
+        result.sort(key=lambda x: x[2], reverse=True)
+        results.append(result)
+
+    return results
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -78,7 +102,7 @@ def predict():
 
         # Process your result for human
         pred_proba = "{:.3f}".format(np.amax(preds))    # Max probability
-        pred_class = decode_predictions(preds, top=1)   # ImageNet Decode
+        pred_class = decode_predictions_safe(preds, top=1)   # ImageNet Decode
 
         result = str(pred_class[0][0][1])               # Convert to string
         result = result.replace('_', ' ').capitalize()
