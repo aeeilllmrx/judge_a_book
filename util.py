@@ -14,8 +14,8 @@ def base64_to_pil(img_base64):
     Convert base64 image data to PIL image
     """
     image_data = re.sub('^data:image/.+;base64,', '', img_base64)
-    pil_image = Image.open(BytesIO(base64.b64decode(image_data)))
-    image = pil_image.convert("RGB")
+    with Image.open(BytesIO(base64.b64decode(image_data))) as pil_image:
+        image = pil_image.convert("RGB")
     return image
 
 
